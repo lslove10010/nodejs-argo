@@ -1,4 +1,4 @@
-name: auto
+name: ci
 
 on:
   push:
