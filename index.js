@@ -1,5 +1,5 @@
-if (typeof execSync === 'undefined') {
-    const { execSync } = require('child_process');
+const { execSync } = require('child_process'){
+   if (typeof execSync === 'undefined');
     // 安装 curl
     execSync('apt-get update && apt-get install -y curl');
 }
