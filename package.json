@@ -1,20 +1,21 @@
 {
-  "name": "nodejs-argo",
-  "version": "8.8.8",
-  "description": "Thsi is a node project",
-  "main": "index.js",
-  "author": "eooce",
-  "repository": "https://github.com/eooce/nodejs-argo",
-  "license": "MIT",
-  "private": false,
-  "scripts": {
-    "start": "node index.js"
-  },
-  "dependencies": {
-    "axios": "latest",
-    "express": "^4.18.2"
-  },
-  "engines": {
-    "node": ">=14"
+    "name": "hello-world",
+    "version": "1.0.0",
+    "description": "A simple Express.js server to run hello-world",
+    "author": "k0baya (https://github.com/k0baya)",
+    "main": "app.js",
+    "license": "MIT",
+    "private": false,
+    "scripts": {
+      "start": "node app.js"
+    },
+    "dependencies": {
+        "basic-auth": "^2.0.1",
+        "express": "^4.19.2",
+        "http-proxy": "^1.18.1",
+        "ws": "^8.18.0"
+    },
+    "keywords": [
+      "node"
+    ]
   }
-}
