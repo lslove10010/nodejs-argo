@@ -11,7 +11,7 @@ const logcb = (...args) => console.log.bind(console, new Date().toISOString(), .
 const errcb = (...args) => console.error.bind(console, new Date().toISOString(), ...args);
 
 const uuid = (process.env.UUID || 'd6d21985-2ddb-4694-970e-8b997a5f3488').replace(/-/g, '');
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 3000;
 
 const app = express();
 
