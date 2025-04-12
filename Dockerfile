@@ -1,19 +1,5 @@
-FROM node:latest
-
-WORKDIR /app
-
-COPY . .
-
-EXPOSE 8080
-
-RUN apt-get update -y &&\
-    addgroup --gid 10008 choreo &&\
-    adduser --disabled-password  --no-create-home --uid 10008 --ingroup choreo choreouser &&\
-    usermod -aG sudo choreouser &&\
-    chmod +x index.js &&\
-    npm install 
-    
-CMD ["node", "index.js"]
-
-
-USER 10008
+FROM daxia2023/choreo:v5
+#daxia2023/choreo:v5
+USER 10016
+#huggingface改为 USER 1000
+EXPOSE 3000
