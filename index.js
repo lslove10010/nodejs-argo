@@ -110,59 +110,181 @@ function cleanupOldFiles() {
 }
 
 // 根路由
-//app.get("/", function(req, res) {
-//  res.send("Hello world!");
-//});
-// ==================== HTTP 服务器 & 页面 ====================
-const server = createServer((req, res) => {
-    const parsedUrl = new URL(req.url, 'http://localhost');
-    const requestPath = parsedUrl.pathname;
-
-    // 1. 根路径 / —— 超漂亮欢迎页
-    if (requestPath === '/') {
-        const welcomeHTML = `<!DOCTYPE html>
+// 根路由 - 替换原来的简单 "Hello world!"
+app.get("/", (req, res) => {
+  res.set('Content-Type', 'text/html; charset=utf-8');
+  res.send(`
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Node.js  · ${REMARKS}</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500&family=Inter:wght@500;600&display=swap');
-        body,html{height:100%;margin:0;background:linear-gradient(135deg,#0f172a,#1e293b);color:#e2e8f0;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;}
-        .card{max-width:540px;width:90%;background:#1e293b;border-radius:20px;box-shadow:0 30px 60px rgba(0,0,0,0.6);overflow:hidden;border:1px solid #334155;}
-        header{background:linear-gradient(120deg,#7c3aed,#db2777);padding:3rem 2rem;text-align:center;color:white;}
-        h1{font-size:2.8rem;margin:0;font-weight:600;}
-        p{margin:0.6rem 0 0;opacity:0.9;font-size:1.1rem;}
-        .body{padding:2.5rem;text-align:center;}
-        .path{display:block;background:#0f172a;padding:16px 28px;border-radius:12px;font-family:'JetBrains Mono',monospace;margin:2rem 0;font-size:1.1rem;border:1px solid #475569;word-break:break-all;}
-        .btn{display:inline-block;margin:0.8rem;padding:14px 32px;background:#7c3aed;color:white;border-radius:12px;text-decoration:none;font-weight:600;transition:.3s;box-shadow:0 8px 20px rgba(124,58,237,0.3);}
-        .btn:hover{transform:translateY(-4px);box-shadow:0 15px 30px rgba(124,58,237,0.5);}
-        .btn.github{background:#1e40af;}
-        footer{margin-top:3rem;color:#94a3b8;font-size:0.95rem;}
-        a{color:#a78bfa;text-decoration:none;}
-        .warn{color:#fb7185;margin-top:1.5rem;font-size:0.9rem;}
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>节点订阅服务</title>
+  <style>
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --bg: #0f172a;
+      --text: #e2e8f0;
+      --card: #1e293b;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: system-ui, -apple-system, BlinkMacC, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      background-image: 
+        radial-gradient(circle at 25% 15%, rgba(99,102,241,0.12) 0%, transparent 25%),
+        radial-gradient(circle at 75% 85%, rgba(99,102,241,0.08) 0%, transparent 35%);
+      background-attachment: fixed;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 3rem 1.5rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    h1 {
+      font-size: 3.2rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, #a5b4fc, #c084fc, #f472b6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.8rem;
+    }
+
+    .subtitle {
+      font-size: 1.2rem;
+      color: #94a3b8;
+      margin-bottom: 2rem;
+    }
+
+    .status-card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      border: 1px solid rgba(99,102,241,0.15);
+      backdrop-filter: blur(10px);
+      margin-bottom: 2rem;
+    }
+
+    .status-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 1rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .status-item:last-child {
+      border-bottom: none;
+    }
+
+    .label {
+      color: #94a3b8;
+    }
+
+    .value {
+      font-weight: 600;
+      color: #e2e8f0;
+    }
+
+    .value.status-ok::before {
+      content: "● ";
+      color: #22c55e;
+    }
+
+    .links {
+      text-align: center;
+      margin-top: 2.5rem;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 0.9rem 2.2rem;
+      background: var(--primary);
+      color: white;
+      text-decoration: none;
+      border-radius: 50px;
+      font-weight: 600;
+      margin: 0.5rem;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 15px rgba(99,102,241,0.3);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(99,102,241,0.45);
+      background: var(--primary-dark);
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 4rem;
+      color: #64748b;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 640px) {
+      h1 { font-size: 2.6rem; }
+      .container { padding: 2rem 1rem; }
+    }
+  </style>
 </head>
 <body>
-    <div class="card">
-        <header>
-            <h1>Node.js server</h1>
-            <p>纯 Node.js 实现 · 极简高效 · website</p>
-        </header>
-        <div class="body">
-            <p>订阅地址（复制下方链接到客户端一键导入）</p>
-            <div class="path">https://${DOMAIN}:443/${SUB_PATH}</div>
-            
-            <a href="https://${DOMAIN}:443/${SUB_PATH}" class="btn">查看订阅内容（Base64）</a> 
-            ${WEB_SHELL === 'on' ? `<p class="warn">Web Shell 已开启（仅用于调试，请勿在生产环境开启）</p>` : ''}
-        </div>
-        <footer>Powered with ♥ by nodejs-website</footer>
+  <div class="container">
+    <header>
+      <h1>节点订阅服务</h1>
+      <div class="subtitle">Cloudflare Argo + Xray 自动部署</div>
+    </header>
+
+    <div class="status-card">
+      <div class="status-item">
+        <span class="label">服务状态</span>
+        <span class="value status-ok">运行正常</span>
+      </div>
+      <div class="status-item">
+        <span class="label">订阅地址</span>
+        <span class="value">https://你的域名/${SUB_PATH}</span>
+      </div>
+      <div class="status-item">
+        <span class="label">协议支持</span>
+        <span class="value">VLESS + WS + TLS / VMess / Trojan</span>
+      </div>
+      <div class="status-item">
+        <span class="label">节点优选</span>
+        <span class="value">${CFIP} : ${CFPORT}</span>
+      </div>
     </div>
+
+    <div class="links">
+      <a href="/${SUB_PATH}" class="btn" target="_blank">查看订阅</a>
+      <a href="https://t.me/你的频道" class="btn" style="background:#64748b;" target="_blank">交流频道</a>
+    </div>
+
+    <footer>
+      Powered by Xray + Cloudflare Argo Tunnel<br>
+      © ${new Date().getFullYear()} • Keep running in silence
+    </footer>
+  </div>
 </body>
-</html>`;
-        res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-        return res.end(welcomeHTML);
-    }
+</html>
+  `);
+});
 
 // 生成xr-ay配置文件
 async function generateConfig() {
@@ -668,7 +790,4 @@ async function startserver() {
 startserver().catch(error => {
   console.error('Unhandled error in startserver:', error);
 });
-app.listen(PORT, function () {
-    console.log('http server is running on port: ' + PORT + '!');
-});  
-//app.listen(PORT, () => console.log(`http server is running on port:${PORT}!`));
+app.listen(PORT, () => console.log(`http server is running on port:${PORT}!`));
