@@ -115,172 +115,185 @@ app.get("/", (req, res) => {
   res.set('Content-Type', 'text/html; charset=utf-8');
   res.send(`
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>节点订阅服务</title>
+  <title>张三的个人空间</title>
+  <meta name="description" content="分享一些日常想法、生活记录和技术随笔"/>
   <style>
     :root {
-      --primary: #6366f1;
-      --primary-dark: #4f46e5;
-      --bg: #0f172a;
-      --text: #e2e8f0;
-      --card: #1e293b;
+      --bg: #0f1217;
+      --text: #e0e7ff;
+      --text-light: #a1a9c2;
+      --accent: #6366f1;
+      --card: #1a1f2e;
+      --border: #2d3748;
     }
-    
+
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
-    
+
     body {
-      font-family: system-ui, -apple-system, BlinkMacC, "Segoe UI", Roboto, sans-serif;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: var(--bg);
       color: var(--text);
+      line-height: 1.6;
       min-height: 100vh;
-      background-image: 
-        radial-gradient(circle at 25% 15%, rgba(99,102,241,0.12) 0%, transparent 25%),
-        radial-gradient(circle at 75% 85%, rgba(99,102,241,0.08) 0%, transparent 35%);
-      background-attachment: fixed;
     }
 
     .container {
-      max-width: 900px;
+      max-width: 860px;
       margin: 0 auto;
       padding: 3rem 1.5rem;
     }
 
     header {
       text-align: center;
-      margin-bottom: 3rem;
+      padding: 5rem 0 4rem;
     }
 
     h1 {
       font-size: 3.2rem;
       font-weight: 700;
-      background: linear-gradient(90deg, #a5b4fc, #c084fc, #f472b6);
+      margin-bottom: 0.8rem;
+      background: linear-gradient(90deg, #a5b4fc, #c084fc);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: 0.8rem;
     }
 
-    .subtitle {
-      font-size: 1.2rem;
-      color: #94a3b8;
-      margin-bottom: 2rem;
+    .tagline {
+      font-size: 1.3rem;
+      color: var(--text-light);
+      margin-bottom: 1.5rem;
     }
 
-    .status-card {
+    .about {
       background: var(--card);
-      border-radius: 16px;
-      padding: 2rem;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-      border: 1px solid rgba(99,102,241,0.15);
-      backdrop-filter: blur(10px);
-      margin-bottom: 2rem;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2.5rem;
+      margin-bottom: 3rem;
     }
 
-    .status-item {
-      display: flex;
-      justify-content: space-between;
-      padding: 1rem 0;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
+    .about h2 {
+      color: white;
+      margin-bottom: 1.2rem;
+      font-size: 1.8rem;
     }
 
-    .status-item:last-child {
-      border-bottom: none;
+    .projects {
+      display: grid;
+      gap: 2rem;
+      margin-bottom: 4rem;
     }
 
-    .label {
-      color: #94a3b8;
+    .project-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.8rem;
+      transition: transform 0.2s, box-shadow 0.2s;
     }
 
-    .value {
-      font-weight: 600;
-      color: #e2e8f0;
+    .project-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.3);
     }
 
-    .value.status-ok::before {
-      content: "● ";
-      color: #22c55e;
+    .project-card h3 {
+      color: var(--accent);
+      margin-bottom: 0.6rem;
+    }
+
+    .project-card p {
+      color: var(--text-light);
+      margin-bottom: 1rem;
     }
 
     .links {
       text-align: center;
-      margin-top: 2.5rem;
     }
 
     .btn {
       display: inline-block;
-      padding: 0.9rem 2.2rem;
-      background: var(--primary);
+      padding: 0.8rem 1.8rem;
+      background: var(--accent);
       color: white;
       text-decoration: none;
-      border-radius: 50px;
-      font-weight: 600;
-      margin: 0.5rem;
-      transition: all 0.25s ease;
-      box-shadow: 0 4px 15px rgba(99,102,241,0.3);
+      border-radius: 6px;
+      font-weight: 500;
+      transition: background 0.2s;
     }
 
     .btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(99,102,241,0.45);
-      background: var(--primary-dark);
+      background: #4f46e5;
     }
 
     footer {
       text-align: center;
-      margin-top: 4rem;
-      color: #64748b;
+      padding: 3rem 0;
+      color: var(--text-light);
       font-size: 0.9rem;
+      border-top: 1px solid var(--border);
     }
 
     @media (max-width: 640px) {
-      h1 { font-size: 2.6rem; }
+      h1 { font-size: 2.4rem; }
       .container { padding: 2rem 1rem; }
     }
   </style>
 </head>
 <body>
+
   <div class="container">
     <header>
-      <h1>节点订阅服务</h1>
-      <div class="subtitle">Cloudflare Argo + Xray 自动部署</div>
+      <h1>张三</h1>
+      <div class="tagline">普通打工人 · 喜欢折腾 · 偶尔写点东西</div>
     </header>
 
-    <div class="status-card">
-      <div class="status-item">
-        <span class="label">服务状态</span>
-        <span class="value status-ok">运行正常</span>
+    <section class="about">
+      <h2>关于我</h2>
+      <p>
+        目前在北京混日子，平时喜欢研究一些乱七八糟的小玩意儿。<br>
+        主要方向是前端开发、偶尔摸摸后端和运维，喜欢把复杂的东西搞简单。
+      </p>
+      <p>
+        这里放一些随手写的笔记、踩过的坑、看过的书/电影感想，欢迎路过指正。
+      </p>
+    </section>
+
+    <section class="projects">
+      <h2 style="text-align:center; margin-bottom:2rem; color:white;">最近瞎折腾的几个东西</h2>
+      
+      <div class="project-card">
+        <h3>日常随笔收集器</h3>
+        <p>一个用来记录生活碎片的极简工具，自己用着还挺顺手。</p>
       </div>
-      <div class="status-item">
-        <span class="label">订阅地址</span>
-        <span class="value">https://你的域名/${SUB_PATH}</span>
+
+      <div class="project-card">
+        <h3>深夜歌单整理</h3>
+        <p>把过去一年听的最多的歌整理了一下，意外发现自己口味还挺奇怪。</p>
       </div>
-      <div class="status-item">
-        <span class="label">协议支持</span>
-        <span class="value">VLESS + WS + TLS / VMess / Trojan</span>
+
+      <div class="project-card">
+        <h3>桌面小组件实验</h3>
+        <p>用 electron 搞了个桌面小挂件，显示天气+待办+摸鱼倒计时。</p>
       </div>
-      <div class="status-item">
-        <span class="label">节点优选</span>
-        <span class="value">${CFIP} : ${CFPORT}</span>
-      </div>
-    </div>
+    </section>
 
     <div class="links">
-      <a href="/${SUB_PATH}" class="btn" target="_blank">查看订阅</a>
-      <a href="https://t.me/你的频道" class="btn" style="background:#64748b;" target="_blank">交流频道</a>
+      <a href="#" class="btn">查看更多碎碎念 →</a>
     </div>
 
     <footer>
-      Powered by Xray + Cloudflare Argo Tunnel<br>
-      © ${new Date().getFullYear()} • Keep running in silence
+      © 2026 张三 · 随便写写 · 别太认真
     </footer>
   </div>
+
 </body>
 </html>
   `);
