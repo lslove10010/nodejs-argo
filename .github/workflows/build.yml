@@ -1,4 +1,4 @@
-name: Build SubServer Binary
+name: Build Sub Binary
 on:
   push:
     branches: [ main ]
@@ -8,63 +8,50 @@ jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: false # 关键：一个架构失败不终止另一个
+      fail-fast: false
       matrix:
-        target:
+        arch:
           - linux-x64
           - linux-arm64
     steps:
-      - name: 拉取源码
+      - name: Checkout source
         uses: actions/checkout@v4
 
-      - name: 安装 Node 20
+      - name: Setup Node 20
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          # 移除cache，不再要求package-lock.json
 
-      - name: 切换国内npm源 + pkg镜像
+      - name: Config npm & pkg mirror
         run: |
           npm config set registry https://registry.npmmirror.com
+          mkdir -p ./.pkg-cache
+          echo "PKG_CACHE_PATH=$PWD/.pkg-cache" >> $GITHUB_ENV
           echo "PKG_GITHUB_MIRROR=https://registry.npmmirror.com/binary-host" >> $GITHUB_ENV
+          echo "NPM_CONFIG_LOGLEVEL=verbose" >> $GITHUB_ENV
 
-      - name: 安装项目依赖
-        run: npm install --no-save
+      - name: Print file list (debug)
+        run: ls -la
 
-      - name: 全局安装pkg打包工具
-        run: npm install -g pkg
-
-      - name: 打包对应架构二进制
+      - name: Install dependencies
         run: |
-          pkg -t ${{ matrix.target }} index.js -o subserver-${{ matrix.target }}
-          chmod +x subserver-${{ matrix.target }}
-          ls -lh subserver-${{ matrix.target }}
+          npm install --no-save
+          echo "===== npm install finished ====="
 
-      - name: 上传产物
+      - name: Global install pkg
+        run: |
+          npm install -g pkg
+          pkg --version
+
+      - name: Build ${{ matrix.arch }}
+        run: |
+          set -e
+          pkg -t ${{ matrix.arch }} index.js -o subserver-${{ matrix.arch }}
+          chmod +x subserver-${{ matrix.arch }}
+          ls -lh subserver-${{ matrix.arch }}
+
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: subserver-${{ matrix.target }}
-          path: subserver-${{ matrix.target }}
-
-  release:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: 下载全部构建文件
-        uses: actions/download-artifact@v4
-        with:
-          path: out/
-      - name: 整理文件
-        run: mv out/*/* ./
-      - name: 生成版本tag
-        run: echo "TAG=build-${{ github.sha }}" >> $GITHUB_ENV
-      - name: 发布Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ env.TAG }}
-          name: ${{ env.TAG }}
-          files: |
-            subserver-linux-x64
-            subserver-linux-arm64
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          name: subserver-${{ matrix.arch }}
+          path: subserver-${{ matrix.arch }}
